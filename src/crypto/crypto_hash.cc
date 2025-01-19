@@ -11,6 +11,8 @@
 
 namespace node {
 
+using ncrypto::EVPMDCtxPointer;
+using ncrypto::MarkPopErrorOnReturn;
 using v8::Context;
 using v8::FunctionCallbackInfo;
 using v8::FunctionTemplate;
@@ -152,7 +154,7 @@ void Hash::GetCachedAliases(const FunctionCallbackInfo<Value>& args) {
   names.reserve(size);
   values.reserve(size);
   for (auto& [alias, id] : env->alias_to_md_id_map) {
-    names.push_back(OneByteString(isolate, alias.c_str(), alias.size()));
+    names.push_back(OneByteString(isolate, alias));
     values.push_back(v8::Uint32::New(isolate, id));
   }
 #else

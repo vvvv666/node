@@ -3280,6 +3280,43 @@ test('test', (t) => {
 });
 ```
 
+#### `context.assert.fileSnapshot(value, path[, options])`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `value` {any} A value to serialize to a string. If Node.js was started with
+  the [`--test-update-snapshots`][] flag, the serialized value is written to
+  `path`. Otherwise, the serialized value is compared to the contents of the
+  existing snapshot file.
+* `path` {string} The file where the serialized `value` is written.
+* `options` {Object} Optional configuration options. The following properties
+  are supported:
+  * `serializers` {Array} An array of synchronous functions used to serialize
+    `value` into a string. `value` is passed as the only argument to the first
+    serializer function. The return value of each serializer is passed as input
+    to the next serializer. Once all serializers have run, the resulting value
+    is coerced to a string. **Default:** If no serializers are provided, the
+    test runner's default serializers are used.
+
+This function serializes `value` and writes it to the file specified by `path`.
+
+```js
+test('snapshot test with default serialization', (t) => {
+  t.assert.fileSnapshot({ value1: 1, value2: 2 }, './snapshots/snapshot.json');
+});
+```
+
+This function differs from `context.assert.snapshot()` in the following ways:
+
+* The snapshot file path is explicitly provided by the user.
+* Each snapshot file is limited to a single snapshot value.
+* No additional escaping is performed by the test runner.
+
+These differences allow snapshot files to better support features such as syntax
+highlighting.
+
 #### `context.assert.snapshot(value[, options])`
 
 <!-- YAML
@@ -3370,7 +3407,9 @@ added:
   - v22.2.0
   - v20.15.0
 changes:
-  - version: v23.4.0
+  - version:
+    - v23.4.0
+    - v22.13.0
     pr-url: https://github.com/nodejs/node/pull/55895
     description: This function is no longer experimental.
 -->
@@ -3568,6 +3607,27 @@ test('top level test', async (t) => {
   );
 });
 ```
+
+### `context.waitFor(condition[, options])`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+* `condition` {Function|AsyncFunction} An assertion function that is invoked
+  periodically until it completes successfully or the defined polling timeout
+  elapses. Successful completion is defined as not throwing or rejecting. This
+  function does not accept any arguments, and is allowed to return any value.
+* `options` {Object} An optional configuration object for the polling operation.
+  The following properties are supported:
+  * `interval` {number} The number of milliseconds to wait after an unsuccessful
+    invocation of `condition` before trying again. **Default:** `50`.
+  * `timeout` {number} The poll timeout in milliseconds. If `condition` has not
+    succeeded by the time this elapses, an error occurs. **Default:** `1000`.
+* Returns: {Promise} Fulfilled with the value returned by `condition`.
+
+This method polls a `condition` function until that function either returns
+successfully or the operation times out.
 
 ## Class: `SuiteContext`
 
